@@ -17,12 +17,19 @@ const buildBoard = () => {
 }
 
 const generateSquares = () => {
-    for(const num of $('.square')) {
-        let random = Math.floor(Math.random()*numOfSquares)
-        if($('.square').eq(random).text() == '') {
-            $('.square').eq(random).text('2')
-            break
+    const x = []
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            x.push(i)
         }
+    }
+    
+    let random = Math.floor(Math.random()*x.length)
+    let numChance = Math.floor(Math.random()*10)
+    if(numChance < 2) {
+        $('.square').eq(x[random]).text('4')
+    } else {
+        $('.square').eq(x[random]).text('2')
     }
 }
 
@@ -122,7 +129,7 @@ const changeColors = () => {
             $('.square').eq(nums).css('background-color', '#B2A9C6')
         } else if($('.square').eq(nums).text() == 512) {
             $('.square').eq(nums).css('background-color', '#9C91B6')
-        } else if($('.square').eq(nums).text() == 1028) {
+        } else if($('.square').eq(nums).text() == 1024) {
             $('.square').eq(nums).css('background-color', '#8678A5')
         } else if($('.square').eq(nums).text() == 2048) {
             $('.square').eq(nums).css('background-color', '#716293')
@@ -216,12 +223,29 @@ const gameOverCheck = () => {
 
 const left = () => {
     rows = []
+    const prevArr = []
+    const newArr = []
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            prevArr.push(i)
+        }
+    }
     arrOfRows()
     removeZero()
     combineRow()
     removeZero()
     updateBoardRow()
-    generateSquares()
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            newArr.push(i)
+        }
+    }
+    for(let i = 0; i < prevArr.length; i++) {
+        if(prevArr[i] !== newArr[i]) {
+            generateSquares()
+            break
+        }
+    }
     changeColors()
     updateScore()
     gameOverCheck()
@@ -229,6 +253,13 @@ const left = () => {
 
 const right = () => {
     rows = []
+    prevArr = []
+    newArr = []
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            prevArr.push(i)
+        }
+    }
     arrOfRows()
     reverse()
     removeZero()
@@ -236,7 +267,17 @@ const right = () => {
     removeZero()
     reverse()
     updateBoardRow()
-    generateSquares()
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            newArr.push(i)
+        }
+    }
+    for(let i = 0; i < prevArr.length; i++) {
+        if(prevArr[i] !== newArr[i]) {
+            generateSquares()
+            break
+        }
+    }
     changeColors()
     updateScore()
     gameOverCheck()
@@ -244,12 +285,29 @@ const right = () => {
 
 const up = () => {
     rows = []
+    prevArr = []
+    newArr = []
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            prevArr.push(i)
+        }
+    }
     arrOfColumns()
     removeZero()
     combineRow()
     removeZero()
     updateBoardColumn()
-    generateSquares()
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            newArr.push(i)
+        }
+    }
+    for(let i = 0; i < prevArr.length; i++) {
+        if(prevArr[i] !== newArr[i]) {
+            generateSquares()
+            break
+        }
+    }
     changeColors()
     updateScore()
     gameOverCheck()
@@ -257,6 +315,13 @@ const up = () => {
 
 const down = () => {
     rows = []
+    prevArr = []
+    newArr = []
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            prevArr.push(i)
+        }
+    }
     arrOfColumns()
     reverse()
     removeZero()
@@ -264,7 +329,17 @@ const down = () => {
     removeZero()
     reverse()   
     updateBoardColumn()
-    generateSquares()
+    for(let i = 0; i < $('.square').length; i++) {
+        if($('.square').eq(i).text() === '') {
+            newArr.push(i)
+        }
+    }
+    for(let i = 0; i < prevArr.length; i++) {
+        if(prevArr[i] !== newArr[i]) {
+            generateSquares()
+            break
+        }
+    }
     changeColors()
     updateScore()
     gameOverCheck()
