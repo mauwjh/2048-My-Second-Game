@@ -1,20 +1,28 @@
 let rows = []
-const numOfSquares = 25
-const rowSquares = Math.sqrt(numOfSquares)
+let rowSquares = 2
+let numOfSquares = rowSquares*rowSquares
+let heightWidth = 100/rowSquares
 let score = 0
+
+const hideLandingPage = () => {
+    $('.landing-page').addClass('hide')
+}
 
 const buildBoard = () => {
     for(let i =0; i < numOfSquares; i++){
         $('.board').append($('<div>').addClass('square').text(''))
     }
+    console.log(heightWidth)
+    $('.square').css({height: `${heightWidth}%`, width: `${heightWidth}%`})
 }
 
 const generateSquares = () => {
-    let random = Math.floor(Math.random()*numOfSquares)
-    if($('.square').eq(random).text() == '') {
-        $('.square').eq(random).text('2')
-    } else {
-        generateSquares()
+    for(const num of $('.square')) {
+        let random = Math.floor(Math.random()*numOfSquares)
+        if($('.square').eq(random).text() == '') {
+            $('.square').eq(random).text('2')
+            break
+        }
     }
 }
 
@@ -56,9 +64,22 @@ const removeZero = () => {
 const combineRow = () => {
     for(let i = 0; i < rows.length; i++) {
         for(let j = 0; j < rowSquares - 1; j++) {
-            if(rows[i][j] === rows[i][j+1] && rows[i][j] > 0) {
+            if(rows[i][j] === rows[i][j+1] && rows[i][j] !== '') {
+                console.log(rows[i][j], rows[i][j+1])
                 rows[i][j] = rows[i][j] + rows[i][j+1]
                 score += rows[i][j]
+                rows[i][j+1] = ''
+            }
+        }
+    }
+}
+
+const combineRowCheck = () => {
+    for(let i = 0; i < rows.length; i++) {
+        for(let j = 0; j < rowSquares - 1; j++) {
+            if(rows[i][j] === rows[i][j+1] && rows[i][j] !== '') {
+                console.log(rows[i][j], rows[i][j+1])
+                rows[i][j] = rows[i][j] + rows[i][j+1]
                 rows[i][j+1] = ''
             }
         }
@@ -115,6 +136,83 @@ const updateScore = () => {
     $('.score').text(`Score: ${score}`)
 }
 
+const leftCheck = () => {
+    let numOfZeroes = 0
+    rows = []
+    arrOfRows()
+    removeZero()
+    combineRowCheck()
+    removeZero()
+    for(let i = 0; i < rows.length; i ++) {
+        for(let j = 0; j < rows[i].length; j++) {
+            if(rows[i][j] == 0) {
+                numOfZeroes += 1
+            }
+        }
+    }
+    return numOfZeroes
+}
+
+const rightCheck = () => {
+    let numOfZeroes = 0
+    rows = []
+    arrOfRows()
+    reverse()
+    removeZero()
+    combineRowCheck()
+    removeZero()
+    for(let i = 0; i < rows.length; i ++) {
+        for(let j = 0; j < rows[i].length; j++) {
+            if(rows[i][j] == 0) {
+                numOfZeroes += 1
+            }
+        }
+    }
+    return numOfZeroes
+}
+
+const upCheck = () => {
+    let numOfZeroes = 0
+    rows = []
+    arrOfColumns()
+    removeZero()
+    combineRowCheck()
+    removeZero()
+    for(let i = 0; i < rows.length; i ++) {
+        for(let j = 0; j < rows[i].length; j++) {
+            if(rows[i][j] == 0) {
+                numOfZeroes += 1
+            }
+        }
+    }
+    return numOfZeroes
+}
+
+const downCheck = () => {
+    let numOfZeroes = 0
+    rows = []
+    arrOfColumns()
+    reverse()
+    removeZero()
+    combineRowCheck()
+    removeZero()
+    for(let i = 0; i < rows.length; i ++) {
+        for(let j = 0; j < rows[i].length; j++) {
+            if(rows[i][j] == 0) {
+                numOfZeroes += 1
+            }
+        }
+    }
+    return numOfZeroes
+}
+
+const gameOverCheck = () => {
+    let numOfZeroes = (leftCheck() + rightCheck() + upCheck() + downCheck())
+    if(numOfZeroes === 0 && $('.game-over').length < 1) {
+        $('body').append($('<div>').addClass('game-over').html('Game Over!' + '<br>' + `Your score is ${score}`))
+        $('.game-over').addClass('fade-in')
+    }
+}
 
 const left = () => {
     rows = []
@@ -126,6 +224,7 @@ const left = () => {
     generateSquares()
     changeColors()
     updateScore()
+    gameOverCheck()
 }
 
 const right = () => {
@@ -140,6 +239,7 @@ const right = () => {
     generateSquares()
     changeColors()
     updateScore()
+    gameOverCheck()
 }
 
 const up = () => {
@@ -152,6 +252,7 @@ const up = () => {
     generateSquares()
     changeColors()
     updateScore()
+    gameOverCheck()
 }
 
 const down = () => {
@@ -166,15 +267,29 @@ const down = () => {
     generateSquares()
     changeColors()
     updateScore()
+    gameOverCheck()
 }
 
 const main = () => {
-    buildBoard()
-    $('body').prepend($('<div>').text(`Score: ${score}`).addClass('score'))
-    generateSquares()
-    generateSquares()
-    changeColors()
-    document.onkeydown = checkKey;
+    $('#tiles').on('change', () => {
+        rowSquares = parseInt($('#tiles option:selected').val())
+        numOfSquares = rowSquares*rowSquares
+        heightWidth = 100/rowSquares
+        if($('#tiles option:selected').val() !== 'none') {
+            $('.submit').css({'opacity': '1', 'pointer-events': 'auto'})
+        }
+    })
+    $('.submit').on('click', () => {
+        hideLandingPage()
+        buildBoard()
+        $('body').prepend($('<div>').text(`Score: ${score}`).addClass('score'))
+        generateSquares()
+        generateSquares()
+        changeColors()
+        document.onkeydown = checkKey;
+        document.addEventListener('touchstart', handleTouchStart, false);        
+        document.addEventListener('touchmove', handleTouchMove, false);
+    })
 
     function checkKey(e) {
 
@@ -195,8 +310,7 @@ const main = () => {
 
     }
 
-    document.addEventListener('touchstart', handleTouchStart, false);        
-document.addEventListener('touchmove', handleTouchMove, false);
+
 
 var xDown = null;                                                        
 var yDown = null;
